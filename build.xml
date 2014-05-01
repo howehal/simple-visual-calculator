@@ -1,0 +1,30 @@
+<project basedir="." default="war">
+	<property name="src.dir" value="src"/>
+	<property name="build.dir" value="build"/>
+	<property name="web.dir" value="WebContent"/>
+			
+	<property
+		name="classpath"
+		value="
+			lib/jaxrs-api-3.0.7.Final.jar:lib/resteasy-jaxrs-3.0.7.Final.jar
+		"
+	/>
+
+	<target name="clean">
+		<delete dir="${build.dir}"/>
+		<delete dir="dist/"/>
+	</target>
+
+	<target name="compile" depends="clean">
+		<mkdir dir="${build.dir}"/>
+		<javac srcdir="${src.dir}" destdir="${build.dir}" classpath="${classpath}" debug="off"/>
+	</target>
+	
+	<target name="war" depends="compile">
+	   <war destfile="dist/calc.war" webxml="${web.dir}/WEB-INF/web.xml">
+		   <fileset dir="${web.dir}"/>
+	   <lib dir="${web.dir}/WEB-INF/lib"/>
+	   <classes dir="${build.dir}"/>
+	</war>
+	</target>	
+</project>

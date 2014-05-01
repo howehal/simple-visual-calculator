@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Simple Visual Calculator</title>
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+
+  <script>
+  $(function() {
+    //clear button simply clears all text on #myText
+    $( "#clearBtn" ).click(function() {
+        $( "#myText" ).val("");
+    });
+
+    //loop through various numbered buttons
+    var numBtnNames = ["zeroBtn", "oneBtn", "twoBtn", "threeBtn", "fourBtn", "fiveBtn", "sixBtn", "sevenBtn", "eightBtn", "nineBtn"];
+    for(var i = 0; i<numBtnNames.length; i++){
+      $( "#"+numBtnNames[i] ).click(function(event) {
+        //when the value is empty, replace text with new number
+        //the text value happens to be the index number of numBtnNames
+        if($( "#myText" ).val()===""){
+          $( "#myText" ).val(numBtnNames.indexOf(event.target.id));  
+        }
+        //otherwise, append only
+        else{
+          $( "#myText" ).val($( "#myText" ).val() + numBtnNames.indexOf(event.target.id));
+        }
+      });      
+    }
+
+    //this is to process all the operators
+    var operatorBtnNames = ["plusBtn", "minusBtn", "multiplyBtn", "dividBtn", "expBtn"];
+    var operatorBtnValues = ["+", "-", "*", "/", "^"];
+
+    for(var i = 0; i<operatorBtnNames.length; i++){
+      $( "#"+operatorBtnNames[i] ).click(function(event) {
+        //this is when we are trying to input a negative number from the start
+        if(($( "#myText" ).val()==="") && (operatorBtnValues[operatorBtnNames.indexOf(event.target.id)]==="-")){
+          $( "#myText" ).val("-");  
+        }
+        else if($( "#myText" ).val()!=="0"){
+          // var selectedOperator = operatorBtnValues[operatorBtnNames.indexOf(event.target.id)];
+          //the last character of the current equation
+          var lastChar = $( "#myText" ).val().slice(-1);
+          // console.log("last char: " + lastChar);
+          // console.log("event id: " + event.target.id);
+          // console.log("operatorBtnNames.indexOf(event.target.id): " +operatorBtnNames.indexOf(event.target.id));
+          // console.log("operator symble: " + operatorBtnValues[operatorBtnNames.indexOf(event.target.id)]);
+
+          //if the last char is an operator, do not add more operators right after another operator
+          if(!(lastChar === operatorBtnValues[0] || lastChar === operatorBtnValues[1] || lastChar === operatorBtnValues[2] || lastChar === operatorBtnValues[3] || lastChar === operatorBtnValues[4])){
+            //sometimes, event.target.id is null... do not know why
+            if(event.target.id){
+              $( "#myText" ).val($( "#myText" ).val() + operatorBtnValues[operatorBtnNames.indexOf(event.target.id)]);
+              
+            }
+          }
+        }
+      });      
+    }
+
+      //the decimal button
+      $( "#dotBtn").click(function(event) {
+        //as long as the last char is not "." already
+        if(!($( "#myText" ).val().slice(-1)===".")){
+          $( "#myText" ).val($( "#myText" ).val() + ".");
+        }
+      }); 
+
+      //equals or evaluation button, this is where Ajax is triggered
+      $( "#equalsBtn" ).click(function(event) {
+        $( "#editText" ).val($( "#myText" ).val());
+        // this works at a url like: http://localhost:8080/calc/rest/calculator/evaluate/
+          $.get( "./calc/rest/calculator/evaluate/"+$( "#myText" ).val(), function( data ) {
+            $( "#myText" ).val(data); 
+            // alert( "Load was performed." );
+          });
+      }); 
+
+      //edit text field for history. This uses Ajax as well
+      $("#editText").keypress(function(e) {
+          //pressed enter;
+          if(e.which == 13) {
+            $.get( "./calc/rest/calculator/evaluate/"+$( "#editText" ).val(), function( data ) {
+              $( "#myText" ).val(data); 
+              // alert( "Load was performed." );
+            });
+          }
+      });
+  });
+  </script>
+</head>
+<body>
+
+ <label for="editText">History: </label>
+<input type = "text"
+                 id = "editText"
+                 value = ""> 
+                 After editing history, press enter to re-evaluate the expression
+<br>
+
+<input type = "text"
+                 id = "myText"
+                 value = "" readonly> 
+<br>
+<button onclick="" id="clearBtn">CLR</button> <button onclick="" id="expBtn">x<sup>y</sup></button>
+<br>
+<button onclick="" id="sevenBtn">7</button> <button onclick="" id="eightBtn">8</button> <button onclick="" id="nineBtn">9</button> <button onclick="" id="dividBtn">/</button> 
+<br>
+<button onclick="" id="fourBtn">4</button> <button onclick="" id="fiveBtn">5</button> <button onclick="" id="sixBtn">6</button> <button onclick="" id="multiplyBtn">*</button> 
+<br>
+<button onclick="" id="oneBtn">1</button> <button onclick="" id="twoBtn">2</button> <button onclick="" id="threeBtn">3</button> <button onclick="" id="minusBtn">-</button> 
+<br>
+<button onclick="" id="dotBtn">.</button> <button onclick="" id="zeroBtn">0</button> <button onclick="" id="equalsBtn">=</button> <button onclick="" id="plusBtn">+</button> 
+ 
+<!-- <input type="submit" value="A submit button">
+ 
+<a href="#">An anchor</a> -->
+ 
+ 
+</body>
+</html>
